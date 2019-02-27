@@ -49,20 +49,20 @@ def extract_names(filename):
     with open(filename) as f:
         text = f.read()
 
-    return result
+    # return result
 
     # get year using regex
-    year_match = re.match(r'Popularity\sin\s(\d\d\d\d)', text)
+    year_match = re.search(r'Popularity\sin\s(\d\d\d\d)', text)
     # could use assert year_match(for example) to test anywhere in code only when using debugger
     if not year_match:
         print("Could not extract the year")
         return None
-    year = year.match.group(1)
+    year = year_match.group(1)
     print("Found year: {}".format(year))
     result.append(year)
 
     # get the baby names and their ranks, as tuples
-    tuples = re.findall(r'<td>(\d+)</td><td>(\w+)</td><td>(\w+)</td>', test)
+    tuples = re.findall(r'<td>(\d+)</td><td>(\w+)</td><td>(\w+)</td>', text)
 
     # Each tuple looks like this now: ('984', 'Keven', 'Emilia')
     # From data in the tuple, insert into result list
@@ -82,7 +82,7 @@ def extract_names(filename):
     return result
 
 
-def main():
+def create_parser():
     """Create a cmd line parser object with 2 argument definitions"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -90,6 +90,11 @@ def main():
     # The nargs option instructs the parser to expect 1 or more filenames.
     # It will also expand wildcards just like the shell, e.g. 'baby*.html' will work.
     parser.add_argument('files', help='filename(s) to parse', nargs='+')
+    return parser
+
+
+def main():
+    parser = create_parser()
     args = parser.parse_args()
 
     if not args:
@@ -101,15 +106,22 @@ def main():
 
     for file in file_list:
         names = extract_names(file)
-        text = '\n'.join(names)
+        text = '\n'.join(names) + '\n'
 
         if create_summary:
-            txtFile = open(file + '.summary', 'w')
-            txtFile.write(text)
-            txtFile.close()
-            pass
+            with open(file + '.summary', 'w') as text_file:
+                # text_file = open(file + '.summary', 'a')
+                text_file.write(text)
+
         else:
-            print text
+            print(text)
+
+    # option flag
+
+    # +++your code here+++
+    # For each filename, get the names, then either print the text output
+    # or write it to a summary file
+    # extract_names('baby1990.html')
 
 
 if __name__ == '__main__':
